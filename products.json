@@ -1,0 +1,22 @@
+[
+  {"id": 1, "name": "Beginner Tennis Coaching Package", "description": "4-session beginner coaching package with certified coaches.", "price": 150.00, "image_path": "images/product1.jpg"},
+  {"id": 2, "name": "Premium Tennis Racket", "description": "High-quality premium racket for intermediate and advanced players.", "price": 200.00, "image_path": "images/product2.jpg"},
+  {"id": 3, "name": "Peak Time Court Reservation (2 hours)", "description": "Reserve a tennis court for 2 hours during peak time.", "price": 50.00, "image_path": "images/product3.jpg"},
+  {"id": 4, "name": "Advanced Coaching Session", "description": "Single advanced coaching session.", "price": 90.00, "image_path": "images/product4.jpg"},
+  {"id": 5, "name": "Junior Coaching Package", "description": "4-session coaching for juniors aged 8–14.", "price": 120.00, "image_path": "images/product5.jpg"},
+  {"id": 6, "name": "Team Building Tennis Event", "description": "Corporate event with coach, drills, and mini-games.", "price": 300.00, "image_path": "images/product6.jpg"},
+  {"id": 7, "name": "Tennis Strings & Grip Bundle", "description": "Performance strings and overgrips.", "price": 45.00, "image_path": "images/product7.jpg"},
+  {"id": 8, "name": "High-Performance Tennis Shoes", "description": "Lightweight, stable shoes for hard courts.", "price": 130.00, "image_path": "images/product8.jpg"},
+  {"id": 9, "name": "Weekend Court Reservation (2 hours)", "description": "Off-peak court booking for casual play.", "price": 35.00, "image_path": "images/product9.jpg"},
+  {"id": 10, "name": "Video Analysis Coaching Add-on", "description": "Video analysis and personalised feedback.", "price": 60.00, "image_path": "images/product10.jpg"},
+  {"id": 11, "name": "Private 1-on-1 Coaching Hour", "description": "One hour of private coaching.", "price": 85.00, "image_path": "images/product1.jpg"},
+  {"id": 12, "name": "Tennis Ball Machine Rental (2 hours)", "description": "Rent our ball machine for solo practice.", "price": 40.00, "image_path": "images/product2.jpg"},
+  {"id": 13, "name": "Tennis Bag Pro", "description": "6-racket bag with thermal pocket.", "price": 95.00, "image_path": "images/product3.jpg"},
+  {"id": 14, "name": "Wristband & Headband Pack", "description": "Set of wristbands and headbands.", "price": 25.00, "image_path": "images/product4.jpg"},
+  {"id": 15, "name": "Evening Court Booking (1 hour)", "description": "One-hour court under lights.", "price": 45.00, "image_path": "images/product5.jpg"},
+  {"id": 16, "name": "Group Coaching (4 players, 4 sessions)", "description": "Semi-private group of 4 with a coach.", "price": 280.00, "image_path": "images/product6.jpg"},
+  {"id": 17, "name": "Tennis Elbow Support & Grip", "description": "Ergonomic grip and support band.", "price": 22.00, "image_path": "images/product7.jpg"},
+  {"id": 18, "name": "Tournament Entry Package", "description": "Entry to internal round-robin tournament.", "price": 55.00, "image_path": "images/product8.jpg"},
+  {"id": 19, "name": "Kids Tennis Camp (5 days)", "description": "Five-day holiday camp for juniors.", "price": 350.00, "image_path": "images/product9.jpg"},
+  {"id": 20, "name": "Stringing Service", "description": "Professional restringing for one racket.", "price": 35.00, "image_path": "images/product10.jpg"}
+]
