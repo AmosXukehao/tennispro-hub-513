@@ -90,8 +90,12 @@ if ( function_exists( 'tennispro_get_products' ) ) {
 
     <main class="my-orders-main">
         <?php if ( isset( $_GET['order_success'] ) ) : ?>
-            <div class="alert alert-success">
-                Order placed successfully! Your order has been confirmed. You will receive an email confirmation shortly.
+            <div class="alert alert-success" style="background:#d4edda;border:2px solid #28a745;color:#155724;padding:20px;border-radius:10px;font-size:16px;text-align:center;margin-bottom:20px;">
+                <strong style="font-size:20px;">&#10004; Order Placed Successfully!</strong><br>
+                <?php if ( isset( $_GET['order_id'] ) ) : ?>
+                    Your order <strong>#<?php echo (int) $_GET['order_id']; ?></strong> has been confirmed.<br>
+                <?php endif; ?>
+                You will receive an email confirmation shortly. Thank you for shopping with us!
             </div>
         <?php endif; ?>
 

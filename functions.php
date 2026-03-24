@@ -282,6 +282,7 @@ add_action( 'template_redirect', function () {
             exit;
         }
 
+        $was_logged_in = ! empty( $_SESSION['checkout_email'] );
         $customer_name = $full_name !== '' ? $full_name : ( $_SESSION['checkout_name'] ?? $email );
         $_SESSION['checkout_email']              = $email;
         $_SESSION['checkout_name']               = $customer_name;
@@ -374,9 +375,33 @@ add_action( 'template_redirect', function () {
         }
 
         $_SESSION['cart'] = [];
-        $success_url = home_url( '/' );
-        $success_url = add_query_arg( [ 'order_success' => '1', 'order_id' => $order_id ], $success_url );
-        wp_safe_redirect( $success_url );
+        $_SESSION['last_order_id']    = $order_id;
+        $_SESSION['last_order_total'] = $total;
+        $_SESSION['last_order_name']  = $customer_name;
+        $_SESSION['last_order_items'] = $items;
+
+        if ( ! $was_logged_in ) {
+            unset(
+                $_SESSION['checkout_email'],
+                $_SESSION['checkout_name'],
+                $_SESSION['checkout_user_id'],
+                $_SESSION['checkout_phone'],
+                $_SESSION['checkout_shipping_address'],
+                $_SESSION['checkout_billing_address'],
+                $_SESSION['checkout_payment_method'],
+                $_SESSION['checkout_order_notes']
+            );
+        }
+
+        $confirm_url = home_url( '/checkout/' );
+        $confirm_url = add_query_arg( 'order_success', '1', $confirm_url );
+        wp_safe_redirect( $confirm_url );
+        exit;
+    }
+
+    // Show order confirmation page (no login required).
+    if ( is_page( 'checkout' ) && isset( $_GET['order_success'] ) && ! empty( $_SESSION['last_order_id'] ) ) {
+        tennispro_render_order_confirmation();
         exit;
     }
 
@@ -401,6 +426,94 @@ add_action( 'template_redirect', function () {
         }
     }
 }, 0 );
+
+/**
+ * Render: Order confirmation page (public, no login required).
+ */
+function tennispro_render_order_confirmation() {
+    get_header();
+
+    $order_id    = (int) ( $_SESSION['last_order_id'] ?? 0 );
+    $order_total = (float) ( $_SESSION['last_order_total'] ?? 0 );
+    $order_name  = (string) ( $_SESSION['last_order_name'] ?? '' );
+    $order_items = (array) ( $_SESSION['last_order_items'] ?? [] );
+
+    $products = function_exists( 'tennispro_get_products' ) ? tennispro_get_products() : [];
+    $product_map = [];
+    foreach ( $products as $p ) {
+        $product_map[ (int) ( $p['id'] ?? 0 ) ] = $p;
+    }
+
+    $shipping = $order_total > 0 ? 10.0 : 0.0;
+    $grand    = $order_total + $shipping;
+
+    unset(
+        $_SESSION['last_order_id'],
+        $_SESSION['last_order_total'],
+        $_SESSION['last_order_name'],
+        $_SESSION['last_order_items']
+    );
+
+    $products_url = get_permalink( get_page_by_path( 'products' ) ) ?: home_url( '/products/' );
+    $home_url     = home_url( '/' );
+
+    echo '<div class="tennispro-page-wrap">';
+    ?>
+    <div style="max-width:650px;margin:40px auto;text-align:center;">
+        <div style="background:#d4edda;border:2px solid #28a745;border-radius:14px;padding:36px 28px;margin-bottom:30px;">
+            <div style="font-size:56px;margin-bottom:10px;">&#10004;</div>
+            <h1 style="color:#155724;margin:0 0 8px;">Order Placed Successfully!</h1>
+            <p style="color:#155724;font-size:17px;margin:0;">
+                Thank you<?php echo $order_name !== '' ? ', <strong>' . esc_html( $order_name ) . '</strong>' : ''; ?>! Your order has been confirmed.
+            </p>
+        </div>
+
+        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:24px;text-align:left;margin-bottom:24px;">
+            <h2 style="margin-top:0;">Order Details</h2>
+            <p><strong>Order Number:</strong> #<?php echo $order_id; ?></p>
+
+            <?php if ( ! empty( $order_items ) ) : ?>
+                <table style="width:100%;border-collapse:collapse;margin:14px 0;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #ddd;">
+                            <th style="text-align:left;padding:8px 4px;">Product</th>
+                            <th style="text-align:center;padding:8px 4px;">Qty</th>
+                            <th style="text-align:right;padding:8px 4px;">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ( $order_items as $item ) :
+                            $pid  = (int) $item['product_id'];
+                            $qty  = (int) $item['quantity'];
+                            $unit = (float) $item['unit_price'];
+                            $name = $product_map[ $pid ]['name'] ?? ( 'Product #' . $pid );
+                        ?>
+                            <tr style="border-bottom:1px solid #eee;">
+                                <td style="padding:8px 4px;"><?php echo esc_html( $name ); ?></td>
+                                <td style="text-align:center;padding:8px 4px;"><?php echo $qty; ?></td>
+                                <td style="text-align:right;padding:8px 4px;">$<?php echo number_format( $unit * $qty, 2 ); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+                <div style="border-top:2px solid #ddd;padding-top:10px;margin-top:4px;">
+                    <p style="display:flex;justify-content:space-between;margin:4px 0;"><span>Subtotal</span><span>$<?php echo number_format( $order_total, 2 ); ?></span></p>
+                    <p style="display:flex;justify-content:space-between;margin:4px 0;"><span>Shipping</span><span>$<?php echo number_format( $shipping, 2 ); ?></span></p>
+                    <p style="display:flex;justify-content:space-between;margin:4px 0;font-weight:bold;font-size:18px;"><span>Total</span><span>$<?php echo number_format( $grand, 2 ); ?></span></p>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+            <a href="<?php echo esc_url( $products_url ); ?>" class="btn">Continue Shopping</a>
+            <a href="<?php echo esc_url( $home_url ); ?>" class="btn" style="background:#6c757d;">Back to Home</a>
+        </div>
+    </div>
+    <?php
+    echo '</div>';
+    get_footer();
+}
 
 /**
  * Direct render: Checkout page.
