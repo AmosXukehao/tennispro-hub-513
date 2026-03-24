@@ -6,19 +6,14 @@
  */
 defined( 'ABSPATH' ) || exit;
 
-get_header();
-
 $error   = '';
-$success = false;
 
 // Handle logout via query parameter ?logout=1
 if ( isset( $_GET['logout'] ) && $_GET['logout'] == '1' ) {
     unset( $_SESSION['checkout_email'], $_SESSION['checkout_user_id'], $_SESSION['checkout_name'] );
-    $success = false;
-    $error   = '';
 }
 
-// Handle login
+// Handle login — BEFORE any output so redirect works
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     $email = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
     $phone = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
@@ -36,26 +31,27 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
             if ( $_SESSION['checkout_name'] === '' ) {
                 $_SESSION['checkout_name'] = $email;
             }
-            $success = true;
+            $account_page = get_permalink( get_page_by_path( 'my-orders' ) ) ?: home_url( '/my-orders/' );
+            wp_safe_redirect( $account_page );
+            exit;
         } else {
             $error = 'We could not find a customer with that Email and Phone. Please check your details or register first.';
         }
     }
 }
+
+get_header();
 ?>
-<h1>Customer login</h1>
-<p>Log in with the Email and Phone Number you used when registering. This verifies you against our FluentCRM customer list.</p>
+<h1>Customer Login</h1>
+<p>Log in with the Email and Phone Number you used when registering.</p>
 
 <?php if ( ! empty( $_SESSION['checkout_email'] ) ) : ?>
     <div class="alert alert-success">
         You are currently logged in as
         <strong><?php echo esc_html( $_SESSION['checkout_name'] ?? $_SESSION['checkout_email'] ); ?></strong>.
-        <a href="<?php echo esc_url( add_query_arg( 'logout', '1', get_permalink() ) ); ?>" style="margin-left:8px;">Log out</a>
-    </div>
-<?php elseif ( $success ) : ?>
-    <div class="alert alert-success">
-        You are now logged in as <?php echo esc_html( $_SESSION['checkout_name'] ?? $_SESSION['checkout_email'] ?? '' ); ?>.
-        You can now continue to browse products, view your cart, or proceed to checkout.
+        <a href="<?php echo esc_url( get_permalink( get_page_by_path( 'my-orders' ) ) ?: home_url( '/my-orders/' ) ); ?>" style="margin-left:8px;">Go to My Account</a>
+        &nbsp;|&nbsp;
+        <a href="<?php echo esc_url( add_query_arg( 'logout', '1', get_permalink() ) ); ?>">Log out</a>
     </div>
 <?php endif; ?>
 
@@ -82,4 +78,3 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 <?php endif; ?>
 
 <?php get_footer(); ?>
-

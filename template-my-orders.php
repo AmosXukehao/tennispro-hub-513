@@ -109,6 +109,7 @@ if ( function_exists( 'tennispro_get_products' ) ) {
             $cards = function_exists( 'tennispro_get_customer_cards' ) ? tennispro_get_customer_cards( $customer_email ) : [];
             ?>
             <?php if ( $cards ) : ?>
+                <div class="table-responsive">
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -129,6 +130,7 @@ if ( function_exists( 'tennispro_get_products' ) ) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             <?php endif; ?>
 
             <h3 style="margin-top:16px;">Add a new card</h3>
@@ -195,6 +197,7 @@ if ( function_exists( 'tennispro_get_products' ) ) {
                     Placed on <?php echo esc_html( $current_order['created_at'] ); ?>,
                     total $<?php echo number_format( (float) $current_order['total_amount'], 2 ); ?>.
                 </p>
+                <div class="table-responsive">
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -221,6 +224,7 @@ if ( function_exists( 'tennispro_get_products' ) ) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
             </section>
         <?php endif; ?>
     </main>

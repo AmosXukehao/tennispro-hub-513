@@ -10,10 +10,10 @@ global $wpdb;
 $prefix = $wpdb->prefix;
 $error  = '';
 
-if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+if ( $_SERVER['REQUEST_METHOD'] === 'POST' && ! empty( $_SESSION['checkout_name'] ) ) {
     $title   = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
     $content = isset( $_POST['content'] ) ? sanitize_textarea_field( wp_unslash( $_POST['content'] ) ) : '';
-    $author  = is_user_logged_in() ? wp_get_current_user()->display_name : ( isset( $_POST['author'] ) ? sanitize_text_field( wp_unslash( $_POST['author'] ) ) : 'Guest' );
+    $author  = $_SESSION['checkout_name'];
     if ( $title === '' || $content === '' ) {
         $error = 'Title and content are required.';
     } else {
@@ -28,6 +28,8 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
             [ '%s', '%s', '%s', '%s' ]
         );
     }
+} elseif ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+    $error = 'You must be logged in to post.';
 }
 
 $posts = $wpdb->get_results(
@@ -42,24 +44,26 @@ $posts = $wpdb->get_results(
     <div class="alert alert-error"><?php echo esc_html( $error ); ?></div>
 <?php endif; ?>
 
-<h2>Create a new post</h2>
-<form method="post">
-    <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title" required>
-    </div>
-    <?php if ( ! is_user_logged_in() ) : ?>
+<?php if ( ! empty( $_SESSION['checkout_name'] ) ) : ?>
+    <h2>Create a new post</h2>
+    <p style="color:#588157;margin-bottom:10px;">Posting as: <strong><?php echo esc_html( $_SESSION['checkout_name'] ); ?></strong></p>
+    <form method="post">
         <div class="form-group">
-            <label for="author">Your name</label>
-            <input type="text" id="author" name="author" value="Guest">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" required>
         </div>
-    <?php endif; ?>
-    <div class="form-group">
-        <label for="content">Content</label>
-        <textarea id="content" name="content" rows="4" required></textarea>
+        <div class="form-group">
+            <label for="content">Content</label>
+            <textarea id="content" name="content" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn">Post</button>
+    </form>
+<?php else : ?>
+    <div class="alert" style="background:#fff3cd;border:1px solid #ffc107;color:#856404;padding:16px;border-radius:8px;margin:20px 0;">
+        <strong>Login required</strong> — You must be logged in to create a post.
+        <a href="<?php echo esc_url( get_permalink( get_page_by_path( 'login' ) ) ?: home_url( '/login/' ) ); ?>" class="btn" style="margin-left:12px;padding:6px 16px;font-size:14px;">Customer Login</a>
     </div>
-    <button type="submit" class="btn">Post</button>
-</form>
+<?php endif; ?>
 
 <h2>Latest posts</h2>
 <?php if ( empty( $posts ) ) : ?>

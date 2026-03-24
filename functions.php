@@ -264,10 +264,11 @@ add_action( 'template_redirect', function () {
         }
     }
 
-    // Handle Checkout submission early (before any theme output), place order, then redirect to Account.
+    // Handle Checkout submission early (before any theme output), place order, then redirect.
     if ( is_page( 'checkout' ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['tennispro_checkout_submit'] ) ) {
         $email            = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
         $phone            = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+        $full_name        = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['full_name'] ) ) : '';
         $shipping_address = isset( $_POST['shipping_address'] ) ? sanitize_textarea_field( wp_unslash( $_POST['shipping_address'] ) ) : '';
         $billing_address  = isset( $_POST['billing_address'] ) ? sanitize_textarea_field( wp_unslash( $_POST['billing_address'] ) ) : '';
         $payment_method   = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : 'credit_card';
@@ -275,19 +276,15 @@ add_action( 'template_redirect', function () {
         $card_name        = isset( $_POST['card_name'] ) ? sanitize_text_field( wp_unslash( $_POST['card_name'] ) ) : '';
         $card_no          = isset( $_POST['card_no'] ) ? sanitize_text_field( wp_unslash( $_POST['card_no'] ) ) : '';
 
-        $sub = function_exists( 'tennispro_checkout_verify' ) ? tennispro_checkout_verify( $email, $phone ) : null;
-        if ( ! $sub ) {
-            $_SESSION['checkout_error'] = 'Email and Phone not found in our customer list. Please register first or check your details.';
+        if ( $email === '' || ! is_email( $email ) ) {
+            $_SESSION['checkout_error'] = 'Please enter a valid email address.';
             wp_safe_redirect( get_permalink() );
             exit;
         }
 
-        $_SESSION['checkout_email']              = $sub['email'] ?? $email;
-        $_SESSION['checkout_user_id']            = $sub['id'] ?? null;
-        $_SESSION['checkout_name']               = trim( ( $sub['first_name'] ?? '' ) . ' ' . ( $sub['last_name'] ?? '' ) );
-        if ( $_SESSION['checkout_name'] === '' ) {
-            $_SESSION['checkout_name'] = $email;
-        }
+        $customer_name = $full_name !== '' ? $full_name : ( $_SESSION['checkout_name'] ?? $email );
+        $_SESSION['checkout_email']              = $email;
+        $_SESSION['checkout_name']               = $customer_name;
         $_SESSION['checkout_phone']              = $phone;
         $_SESSION['checkout_shipping_address']   = $shipping_address;
         $_SESSION['checkout_billing_address']    = $billing_address;
@@ -295,7 +292,6 @@ add_action( 'template_redirect', function () {
         $_SESSION['checkout_order_notes']        = $order_notes;
         unset( $_SESSION['checkout_error'] );
 
-        // Require card details for card-based methods.
         if ( in_array( $payment_method, [ 'credit_card', 'debit_card' ], true ) ) {
             if ( $card_name === '' || $card_no === '' ) {
                 $_SESSION['checkout_error'] = 'Please enter card holder name and card number.';
@@ -304,7 +300,6 @@ add_action( 'template_redirect', function () {
             }
         }
 
-        // Create order from cart.
         $cart = $_SESSION['cart'] ?? [];
         if ( empty( $cart ) ) {
             $_SESSION['checkout_error'] = 'Your cart is empty.';
@@ -343,14 +338,13 @@ add_action( 'template_redirect', function () {
             exit;
         }
 
-        $user_name     = $_SESSION['checkout_name'] ?: ( $_SESSION['checkout_email'] ?: 'guest' );
-        $contact_name  = $card_name !== '' ? $card_name : $user_name;
-        $contact_phone = $_SESSION['checkout_phone'] ?? '';
+        $contact_name  = $card_name !== '' ? $card_name : $customer_name;
+        $contact_phone = $phone;
 
         $wpdb->insert(
             $prefix . 'orders',
             [
-                'user_name'     => $user_name,
+                'user_name'     => $customer_name,
                 'total_amount'  => $total,
                 'contact_name'  => $contact_name,
                 'contact_phone' => $contact_phone,
@@ -375,16 +369,14 @@ add_action( 'template_redirect', function () {
             }
         }
 
-        // Save card (brand + last4 only) for the Account page.
         if ( $order_id > 0 && $card_name !== '' && $card_no !== '' && function_exists( 'tennispro_save_customer_card' ) ) {
-            tennispro_save_customer_card( $_SESSION['checkout_email'] ?? '', $card_name, $card_no );
+            tennispro_save_customer_card( $email, $card_name, $card_no );
         }
 
-        // Clear cart and redirect to Account page with success message.
         $_SESSION['cart'] = [];
-        $account_page = get_permalink( get_page_by_path( 'my-orders' ) ) ?: home_url( '/my-orders/' );
-        $account_page = add_query_arg( [ 'order_success' => '1', 'order_id' => $order_id ], $account_page );
-        wp_safe_redirect( $account_page );
+        $success_url = home_url( '/' );
+        $success_url = add_query_arg( [ 'order_success' => '1', 'order_id' => $order_id ], $success_url );
+        wp_safe_redirect( $success_url );
         exit;
     }
 
@@ -448,7 +440,11 @@ function tennispro_render_checkout_page() {
             <form method="post" action="<?php echo esc_url( get_permalink() ); ?>">
                 <input type="hidden" name="tennispro_checkout_submit" value="1">
                 <div class="form-group">
-                    <label for="email">Email (must match customer list)</label>
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" value="<?php echo esc_attr( $_SESSION['checkout_name'] ?? '' ); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
                     <input type="email" id="email" name="email" value="<?php echo esc_attr( $_SESSION['checkout_email'] ?? '' ); ?>" required>
                 </div>
                 <div class="form-group">
@@ -491,8 +487,6 @@ function tennispro_render_checkout_page() {
 
                 <button type="submit" class="btn">Place order</button>
             </form>
-            <p style="margin-top:10px;"><a href="<?php echo esc_url( get_permalink( get_page_by_path( 'register' ) ) ?: home_url( '/register/' ) ); ?>">Register here</a> if you do not have an account.</p>
-
             <script>
             (function(){
               function toggleCardFields(){
@@ -1267,7 +1261,11 @@ add_filter( 'the_content', function ( $content ) {
                 <form method="post" action="<?php echo esc_url( get_permalink() ); ?>">
                     <input type="hidden" name="tennispro_checkout_submit" value="1">
                     <div class="form-group">
-                        <label for="email">Email (must match customer list)</label>
+                        <label for="full_name">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" value="<?php echo esc_attr( $_SESSION['checkout_name'] ?? '' ); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
                         <input type="email" id="email" name="email" value="<?php echo esc_attr( $_SESSION['checkout_email'] ?? '' ); ?>" required>
                     </div>
                     <div class="form-group">
@@ -1297,7 +1295,7 @@ add_filter( 'the_content', function ( $content ) {
                         <textarea id="order_notes" name="order_notes" rows="3" placeholder="Any special instructions for your order"><?php echo esc_textarea( $_SESSION['checkout_order_notes'] ?? '' ); ?></textarea>
                     </div>
 
-                    <button type="submit" class="btn">Continue to payment</button>
+                    <button type="submit" class="btn">Place order</button>
                 </form>
             </section>
 

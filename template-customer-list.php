@@ -5,11 +5,6 @@
  */
 defined( 'ABSPATH' ) || exit;
 
-if ( ! current_user_can( 'manage_options' ) && ! is_user_logged_in() ) {
-    wp_safe_redirect( wp_login_url( get_permalink() ) );
-    exit;
-}
-
 get_header();
 
 $subscribers = function_exists( 'tennispro_get_subscribers' ) ? tennispro_get_subscribers( 200 ) : [];
@@ -20,6 +15,7 @@ $subscribers = function_exists( 'tennispro_get_subscribers' ) ? tennispro_get_su
 <?php if ( empty( $subscribers ) ) : ?>
     <p>No subscribers yet. Add contacts via your FluentCRM registration form.</p>
 <?php else : ?>
+    <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
@@ -44,6 +40,7 @@ $subscribers = function_exists( 'tennispro_get_subscribers' ) ? tennispro_get_su
             <?php endforeach; ?>
         </tbody>
     </table>
+    </div>
     <p><strong><?php echo count( $subscribers ); ?></strong> subscriber(s).</p>
 <?php endif; ?>
 

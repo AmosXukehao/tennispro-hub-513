@@ -28,6 +28,7 @@ $checkout_url = esc_url( get_permalink( get_page_by_path( 'checkout' ) ) ?: home
     <div class="cart-layout">
         <section class="cart-items-panel">
             <h2>Cart Items</h2>
+            <div class="table-responsive">
             <table class="table" id="cart-table">
                 <thead>
                     <tr>
@@ -64,6 +65,7 @@ $checkout_url = esc_url( get_permalink( get_page_by_path( 'checkout' ) ) ?: home
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
             <button type="button" class="btn btn-secondary" onclick="cartClear()" style="margin-top:12px;">Clear cart</button>
         </section>
 
@@ -128,8 +130,8 @@ $checkout_url = esc_url( get_permalink( get_page_by_path( 'checkout' ) ) ?: home
         container.innerHTML =
             '<div class="cart-layout">'
             + '<section class="cart-items-panel"><h2>Cart Items</h2>'
-            + '<table class="table"><thead><tr><th>Product</th><th>Unit price</th><th>Quantity</th><th>Subtotal</th></tr></thead>'
-            + '<tbody>' + rows + '</tbody></table>'
+            + '<div class="table-responsive"><table class="table"><thead><tr><th>Product</th><th>Unit price</th><th>Quantity</th><th>Subtotal</th></tr></thead>'
+            + '<tbody>' + rows + '</tbody></table></div>'
             + '<button type="button" class="btn btn-secondary" onclick="cartClear()" style="margin-top:12px;">Clear cart</button>'
             + '</section>'
             + '<aside class="cart-summary-panel"><h2>Order Summary</h2>'

@@ -92,7 +92,7 @@ header.tennispro-header .header-auth {
     position: relative !important;
 }
 
-/* ─── Auth dropdown (far right) ─── */
+/* ─── Auth dropdown (far right) — unified trigger + menu ─── */
 header.tennispro-header .nav-auth-dropdown {
     position: relative !important;
 }
@@ -104,43 +104,54 @@ header.tennispro-header a.nav-auth-trigger:visited {
     gap: 5px !important;
     background: rgba(255,255,255,0.12) !important;
     color: #fff !important;
-    padding: 7px 16px !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
+    padding: 9px 18px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255,255,255,0.25) !important;
     cursor: pointer !important;
     font-size: 14px !important;
     font-weight: 600 !important;
     text-decoration: none !important;
     white-space: nowrap !important;
-    transition: background 0.2s !important;
+    transition: all 0.15s !important;
+    position: relative !important;
+    z-index: 10001 !important;
 }
-header.tennispro-header a.nav-auth-trigger:hover,
-header.tennispro-header a.nav-auth-trigger:focus {
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: #fff !important;
+/* Hover: trigger merges with dropdown below */
+header.tennispro-header .nav-auth-dropdown:hover > a.nav-auth-trigger {
+    background: #fff !important;
+    color: #344E41 !important;
+    border-color: #d6dec9 !important;
+    border-bottom-color: #fff !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
     text-decoration: none !important;
 }
 header.tennispro-header .nav-auth-caret {
     font-size: 10px !important;
     opacity: 0.85 !important;
+    transition: transform 0.2s !important;
+}
+header.tennispro-header .nav-auth-dropdown:hover .nav-auth-caret {
+    transform: rotate(180deg) !important;
 }
 
-/* Dropdown menu: HIDDEN by default */
+/* Dropdown menu: attached directly below trigger, no gap */
 header.tennispro-header .nav-auth-menu {
     position: absolute !important;
     right: 0 !important;
-    top: calc(100% + 6px) !important;
-    min-width: 180px !important;
-    background: #fdfefb !important;
+    top: 100% !important;
+    margin-top: -1px !important;
+    min-width: 100% !important;
+    background: #fff !important;
     border: 1px solid #d6dec9 !important;
-    border-radius: 12px !important;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.14) !important;
-    padding: 6px !important;
+    border-top: none !important;
+    border-radius: 0 0 10px 10px !important;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1) !important;
+    padding: 2px 0 6px 0 !important;
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     z-index: 10000 !important;
-    transition: opacity 0.15s, visibility 0.15s !important;
 }
 /* Show on hover / focus-within */
 header.tennispro-header .nav-auth-dropdown:hover > .nav-auth-menu,
@@ -153,16 +164,16 @@ header.tennispro-header .nav-auth-menu a.nav-auth-item,
 header.tennispro-header .nav-auth-menu a.nav-auth-item:link,
 header.tennispro-header .nav-auth-menu a.nav-auth-item:visited {
     display: block !important;
-    padding: 9px 12px !important;
-    border-radius: 8px !important;
+    padding: 10px 18px !important;
+    border-radius: 0 !important;
     text-decoration: none !important;
     font-size: 14px !important;
-    color: #263026 !important;
+    color: #344E41 !important;
     background: transparent !important;
-    transition: background 0.15s !important;
+    transition: background 0.12s !important;
 }
 header.tennispro-header .nav-auth-menu a.nav-auth-item:hover {
-    background: #e5ecdd !important;
+    background: #e8f0e0 !important;
     color: #263026 !important;
 }
 
@@ -758,35 +769,372 @@ a:hover { color: #2d4733; }
     margin: 0 0 6px 0;
 }
 
+/* Hamburger button — hidden on desktop */
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 1001;
+}
+.hamburger-line {
+    display: block;
+    width: 26px;
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+}
+.mobile-menu-toggle.active .hamburger-line:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+.mobile-menu-toggle.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+.mobile-menu-toggle.active .hamburger-line:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* ─── Responsive: Tablet (≤1024px) ─── */
+@media (max-width: 1024px) {
+    .tennispro-container {
+        margin: 20px 12px 40px 12px;
+        padding: 20px 18px;
+    }
+    .admin-dashboard-columns {
+        grid-template-columns: 1fr;
+    }
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 14px;
+    }
+}
+
+/* ─── Responsive: Mobile (≤768px) ─── */
 @media (max-width: 768px) {
     .tennispro-header {
-        flex-wrap: wrap;
-        padding: 12px 16px;
+        flex-wrap: nowrap !important;
+        padding: 12px 16px !important;
+        justify-content: space-between !important;
+        position: relative !important;
+    }
+
+    .mobile-menu-toggle {
+        display: flex !important;
+        order: 3 !important;
+    }
+
+    header.tennispro-header .header-logo {
+        font-size: 18px !important;
+    }
+
+    header.tennispro-header .header-links {
+        display: none !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        flex-direction: column !important;
+        background: linear-gradient(135deg, #344E41 0%, #3A5A40 50%, #588157 100%) !important;
+        padding: 8px 0 !important;
+        gap: 0 !important;
+        z-index: 1000 !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25) !important;
+        border-top: 1px solid rgba(255,255,255,0.15) !important;
+    }
+    header.tennispro-header .header-links.mobile-open {
+        display: flex !important;
+    }
+
+    header.tennispro-header .header-links a {
+        display: block !important;
+        padding: 13px 20px !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+        font-size: 15px !important;
+        text-align: left !important;
+        border-radius: 0 !important;
+    }
+    header.tennispro-header .header-links a:hover {
+        background: rgba(255,255,255,0.12) !important;
+    }
+
+    header.tennispro-header .header-auth {
+        display: none !important;
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 999 !important;
+        background: linear-gradient(135deg, #3A5A40 0%, #588157 100%) !important;
+        padding: 0 !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+        margin-left: 0 !important;
+    }
+    header.tennispro-header .header-auth.mobile-open {
+        display: block !important;
+    }
+
+    header.tennispro-header .nav-auth-dropdown {
+        padding-bottom: 0 !important;
+    }
+    header.tennispro-header a.nav-auth-trigger {
+        display: block !important;
+        padding: 13px 20px !important;
+        text-align: left !important;
+        font-size: 15px !important;
+        border-radius: 0 !important;
+        border: none !important;
+        background: transparent !important;
+    }
+    header.tennispro-header .nav-auth-menu {
+        position: static !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        box-shadow: none !important;
+        background: rgba(0,0,0,0.12) !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    header.tennispro-header .nav-auth-item {
+        padding: 12px 28px !important;
+        display: block !important;
+        color: #e9f5e6 !important;
+        border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    }
+    header.tennispro-header .nav-auth-item:hover {
+        background: rgba(255,255,255,0.1) !important;
+    }
+
+    .tennispro-container {
+        margin: 12px 8px 32px 8px;
+        padding: 16px 12px;
+        border-radius: 10px;
+    }
+
+    .tennispro-banner {
+        padding: 30px 16px;
+        border-radius: 10px;
+        margin-bottom: 16px;
+    }
+    .tennispro-banner h1 {
+        font-size: 22px;
+    }
+    .tennispro-banner .slogan {
+        font-size: 15px;
+    }
+
+    .tennispro-capstone h1 { font-size: 22px; }
+    .tennispro-capstone h2 { font-size: 18px; }
+    .tennispro-capstone h3 { font-size: 15px; }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 10px;
     }
-    .header-links {
-        order: 3;
-        width: 100%;
-        justify-content: center;
+    .product-card {
+        padding: 10px;
     }
-    .header-auth {
-        margin-left: auto;
+    .product-card img {
+        height: 120px;
     }
+    .product-name { font-size: 14px; }
+    .product-price { font-size: 14px; }
+    .product-desc { font-size: 12px; min-height: auto; -webkit-line-clamp: 2; }
+
     .product-modal-content {
-        margin: 30px 12px;
-        padding: 18px 16px;
+        margin: 20px 8px;
+        padding: 16px 12px;
+        width: calc(100vw - 16px);
     }
     .product-modal-body {
         grid-template-columns: 1fr;
     }
     .product-modal-image img {
-        height: 240px;
+        height: 200px;
     }
+
     .my-orders-layout {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
+    .my-orders-sidebar {
+        padding: 12px 14px;
+    }
+    .my-orders-main {
+        padding: 12px 14px;
+    }
+
     .cart-layout,
     .checkout-layout {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
+    .cart-items-panel,
+    .cart-summary-panel,
+    .checkout-main,
+    .checkout-summary {
+        padding: 12px 14px;
+    }
+
+    .admin-dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+    }
+    .admin-dashboard-columns {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .admin-panel {
+        padding: 12px 14px;
+    }
+    .admin-tabs {
+        gap: 4px;
+    }
+    .admin-tab,
+    a.admin-tab,
+    button.admin-tab,
+    .admin-tabs .admin-tab {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table, .admin-table {
+        font-size: 12px;
+    }
+    .table th, .table td,
+    .admin-table th, .admin-table td {
+        padding: 6px 6px;
+        font-size: 12px;
+    }
+
+    .form-group label { font-size: 13px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
+    .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .order-card header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    .order-meta {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .metric-card {
+        padding: 10px 12px;
+    }
+    .metric-card h2 { font-size: 12px; }
+    .metric-value { font-size: 18px; }
+
+    .tennispro-footer {
+        padding: 14px 10px;
+        font-size: 12px;
+        margin-top: 24px;
+    }
+}
+
+/* ─── Responsive: Small Mobile (≤480px) ─── */
+@media (max-width: 480px) {
+    header.tennispro-header .header-logo {
+        font-size: 15px !important;
+        letter-spacing: 1px !important;
+    }
+
+    .tennispro-container {
+        margin: 8px 4px 24px 4px;
+        padding: 12px 8px;
+    }
+
+    .tennispro-banner {
+        padding: 20px 12px;
+    }
+    .tennispro-banner h1 {
+        font-size: 18px;
+    }
+    .tennispro-banner .slogan {
+        font-size: 13px;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .product-card img {
+        height: 100px;
+    }
+    .product-card {
+        padding: 8px;
+    }
+    .product-name { font-size: 13px; }
+    .product-price { font-size: 13px; }
+    .product-desc { display: none; }
+    .product-actions .btn {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    div.qty-control button.qty-btn,
+    div.qty-control-compact button.qty-btn,
+    button.qty-btn {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+        font-size: 16px !important;
+    }
+    div.qty-control input.qty-input,
+    input.qty-input {
+        width: 36px !important;
+        height: 28px !important;
+        font-size: 13px !important;
+    }
+    span.qty-value {
+        min-width: 28px !important;
+        font-size: 13px !important;
+    }
+
+    .admin-dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .pill-row { gap: 4px; }
+    .pill { font-size: 11px; padding: 3px 8px; }
+
+    .table th, .table td,
+    .admin-table th, .admin-table td {
+        padding: 4px 4px;
+        font-size: 11px;
+    }
+
+    .product-modal-content {
+        margin: 10px 4px;
+        padding: 12px 8px;
+    }
+    .product-modal-image img {
+        height: 160px;
+    }
+}
+
+/* ─── Responsive: table horizontal scroll wrapper ─── */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.table-responsive table {
+    min-width: 500px;
 }

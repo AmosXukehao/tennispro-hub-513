@@ -27,20 +27,16 @@ foreach ( $cart as $pid => $qty ) {
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
     $email            = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
     $phone            = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+    $full_name        = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['full_name'] ) ) : '';
     $shipping_address = isset( $_POST['shipping_address'] ) ? sanitize_textarea_field( wp_unslash( $_POST['shipping_address'] ) ) : '';
     $billing_address  = isset( $_POST['billing_address'] ) ? sanitize_textarea_field( wp_unslash( $_POST['billing_address'] ) ) : '';
     $payment_method   = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : 'credit_card';
     $order_notes      = isset( $_POST['order_notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['order_notes'] ) ) : '';
 
-    $sub   = function_exists( 'tennispro_checkout_verify' ) ? tennispro_checkout_verify( $email, $phone ) : null;
-    if ( $sub ) {
-        $_SESSION['checkout_email']   = $sub['email'] ?? $email;
-        $_SESSION['checkout_user_id'] = $sub['id'] ?? null;
-        $_SESSION['checkout_name']    = trim( ( $sub['first_name'] ?? '' ) . ' ' . ( $sub['last_name'] ?? '' ) );
-        if ( $_SESSION['checkout_name'] === '' ) {
-            $_SESSION['checkout_name'] = $email;
-        }
-        $_SESSION['checkout_phone']           = $phone;
+    if ( $email !== '' && is_email( $email ) ) {
+        $_SESSION['checkout_email']            = $email;
+        $_SESSION['checkout_name']             = $full_name !== '' ? $full_name : $email;
+        $_SESSION['checkout_phone']            = $phone;
         $_SESSION['checkout_shipping_address'] = $shipping_address;
         $_SESSION['checkout_billing_address']  = $billing_address;
         $_SESSION['checkout_payment_method']   = $payment_method;
@@ -49,7 +45,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
         wp_safe_redirect( get_permalink( get_page_by_path( 'payment' ) ) ?: home_url( '/payment/' ) );
         exit;
     }
-    $error = 'Email and Phone not found in our customer list. Please register first or check your details.';
+    $error = 'Please enter a valid email address.';
 }
 ?>
 <h1>Checkout</h1>
@@ -63,7 +59,11 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 
         <form method="post">
             <div class="form-group">
-                <label for="email">Email (must match customer list)</label>
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" name="full_name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
@@ -97,9 +97,6 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
             <button type="submit" class="btn">Continue to payment</button>
         </form>
 
-        <p style="margin-top:16px;">
-            <a href="<?php echo esc_url( get_permalink( get_page_by_path( 'register' ) ) ?: home_url( '/register/' ) ); ?>">Register here</a> if you do not have an account.
-        </p>
     </section>
 
     <aside class="checkout-summary">
