@@ -143,6 +143,37 @@ add_action( 'init', function () {
 add_action( 'wp_ajax_tennispro_cart',        'tennispro_ajax_cart' );
 add_action( 'wp_ajax_nopriv_tennispro_cart', 'tennispro_ajax_cart' );
 
+add_action( 'wp_ajax_tennispro_forum_login',        'tennispro_ajax_forum_login' );
+add_action( 'wp_ajax_nopriv_tennispro_forum_login', 'tennispro_ajax_forum_login' );
+
+function tennispro_ajax_forum_login() {
+    if ( ! isset( $_SESSION ) ) { session_start(); }
+
+    $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+    $phone = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+
+    if ( $email === '' || $phone === '' ) {
+        wp_send_json_error( 'Please enter both Email and Phone Number.' );
+    }
+    if ( ! is_email( $email ) ) {
+        wp_send_json_error( 'Please enter a valid email address.' );
+    }
+
+    $sub = function_exists( 'tennispro_checkout_verify' ) ? tennispro_checkout_verify( $email, $phone ) : null;
+    if ( ! $sub ) {
+        wp_send_json_error( 'Email and Phone not found. Please check your details or register first.' );
+    }
+
+    $_SESSION['checkout_email']   = $sub['email'] ?? $email;
+    $_SESSION['checkout_user_id'] = $sub['id'] ?? null;
+    $_SESSION['checkout_name']    = trim( ( $sub['first_name'] ?? '' ) . ' ' . ( $sub['last_name'] ?? '' ) );
+    if ( $_SESSION['checkout_name'] === '' ) {
+        $_SESSION['checkout_name'] = $email;
+    }
+
+    wp_send_json_success( [ 'name' => $_SESSION['checkout_name'] ] );
+}
+
 function tennispro_ajax_cart() {
     if ( ! isset( $_SESSION ) ) { session_start(); }
     if ( ! isset( $_SESSION['cart'] ) ) { $_SESSION['cart'] = []; }
