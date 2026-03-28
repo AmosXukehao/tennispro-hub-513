@@ -1,7 +1,6 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-$nav_links = function_exists( 'tennispro_nav_links' ) ? tennispro_nav_links() : [];
-$auth_ui   = function_exists( 'tennispro_auth_ui' ) ? tennispro_auth_ui() : [ 'mode' => 'logged_out', 'items' => [] ];
+$auth_ui = function_exists( 'tennispro_auth_ui' ) ? tennispro_auth_ui() : [ 'mode' => 'logged_out', 'items' => [] ];
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -24,11 +23,16 @@ $auth_ui   = function_exists( 'tennispro_auth_ui' ) ? tennispro_auth_ui() : [ 'm
         <span class="hamburger-line"></span>
     </button>
 
-    <nav class="header-links" id="headerLinks">
-        <?php foreach ( $nav_links as $link ) : ?>
-            <a href="<?php echo esc_url( $link['href'] ); ?>"><?php echo esc_html( $link['label'] ); ?></a>
-        <?php endforeach; ?>
-    </nav>
+    <?php
+    wp_nav_menu( [
+        'theme_location'  => 'primary',
+        'container'        => 'nav',
+        'container_class'  => 'header-links',
+        'container_id'     => 'headerLinks',
+        'menu_class'       => 'header-nav-menu',
+        'fallback_cb'      => 'tennispro_fallback_menu',
+    ] );
+    ?>
 
     <div class="header-auth" id="headerAuth">
         <div class="nav-auth-dropdown">

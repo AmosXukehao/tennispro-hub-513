@@ -68,6 +68,39 @@ header.tennispro-header .header-links {
     gap: 2px !important;
     justify-content: center !important;
 }
+header.tennispro-header .header-links ul,
+header.tennispro-header .header-links ul.header-nav-menu,
+header.tennispro-header nav.header-links ul,
+.tennispro-header ul,
+.tennispro-header nav ul {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-left: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 2px !important;
+}
+header.tennispro-header .header-links ul li,
+header.tennispro-header .header-links ul.header-nav-menu li,
+header.tennispro-header nav.header-links ul li,
+.tennispro-header ul li,
+.tennispro-header nav ul li {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-block !important;
+}
+header.tennispro-header .header-links ul li::marker,
+.tennispro-header ul li::marker,
+.tennispro-header nav ul li::marker {
+    content: none !important;
+    display: none !important;
+    font-size: 0 !important;
+}
 header.tennispro-header .header-links a,
 header.tennispro-header .header-links a:link,
 header.tennispro-header .header-links a:visited {
@@ -85,6 +118,10 @@ header.tennispro-header .header-links a:focus {
     background: rgba(255, 255, 255, 0.15) !important;
     color: #fff !important;
     text-decoration: none !important;
+}
+header.tennispro-header .header-links li.current-menu-item > a {
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #fff !important;
 }
 
 header.tennispro-header .header-auth {
@@ -849,6 +886,31 @@ a:hover { color: #2d4733; }
     header.tennispro-header .header-links.mobile-open {
         display: flex !important;
     }
+    header.tennispro-header .header-links ul,
+    header.tennispro-header .header-links ul.header-nav-menu,
+    .tennispro-header nav ul {
+        flex-direction: column !important;
+        gap: 0 !important;
+        width: 100% !important;
+        list-style: none !important;
+        list-style-type: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    header.tennispro-header .header-links ul li,
+    .tennispro-header nav ul li {
+        display: block !important;
+        width: 100% !important;
+        list-style: none !important;
+        list-style-type: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    header.tennispro-header .header-links ul li::marker,
+    .tennispro-header nav ul li::marker {
+        content: none !important;
+        display: none !important;
+    }
 
     header.tennispro-header .header-links a {
         display: block !important;
@@ -901,14 +963,18 @@ a:hover { color: #2d4733; }
         padding: 0 !important;
         margin: 0 !important;
     }
-    header.tennispro-header .nav-auth-item {
+    header.tennispro-header .nav-auth-menu a.nav-auth-item,
+    header.tennispro-header .nav-auth-menu a.nav-auth-item:link,
+    header.tennispro-header .nav-auth-menu a.nav-auth-item:visited {
         padding: 12px 28px !important;
         display: block !important;
         color: #e9f5e6 !important;
+        background: transparent !important;
         border-bottom: 1px solid rgba(255,255,255,0.08) !important;
     }
-    header.tennispro-header .nav-auth-item:hover {
+    header.tennispro-header .nav-auth-menu a.nav-auth-item:hover {
         background: rgba(255,255,255,0.1) !important;
+        color: #fff !important;
     }
 
     .tennispro-container {
